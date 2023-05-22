@@ -1,5 +1,5 @@
-#include"shell.h"
-#include"struct.h"
+#ifndef SHELL_H
+#define SHELL_H
 
 /**
  * terminate - Exits the shell.
@@ -95,3 +95,4 @@ int main(int ac, char **av)
 		return (255);
 	return (datash.status);
 }
+#endif /* SHELL_H */
