@@ -22,4 +22,4 @@ char *concatenate_strings(char *destination, const char *source)
 
 	destination[destIndex] = '\0';
 	return (destination);
-} 
+}

@@ -84,4 +84,5 @@ void display_cd_help(void)
 	write(STDOUT_FILENO, helpText, _strlen(helpText));
 	helpText = "\tChange the shell working directory.\n";
 	write(STDOUT_FILENO, helpText, _strlen(helpText));
-} 
+}
+

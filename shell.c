@@ -1,5 +1,4 @@
-#include"shell.h"
-#include"struct.h"
+#include"main.h"
 
 /**
  * terminate - Exits the shell.
@@ -49,19 +48,19 @@ int show_help_info(data_shell *datash)
 {
 	if (datash->args[1] == 0)
 		display_general_help();  /* Display general help information */
-	else if (_strcmp(datash->args[1], "setenv") == 0)
+	else if (compare_strings(datash->args[1], "setenv") == 0)
 		display_setenv_help();  /* Display help information  */
-	else if (_strcmp(datash->args[1], "env") == 0)
+	else if (compare_strings(datash->args[1], "env") == 0)
 		display_env_help();  /* Display help information for env command */
-	else if (_strcmp(datash->args[1], "unsetenv") == 0)
+	else if (compare_strings(datash->args[1], "unsetenv") == 0)
 		display_unsetenv_help();  /* Display help information for unsetenv command */
-	else if (_strcmp(datash->args[1], "help") == 0)
+	else if (compare_strings(datash->args[1], "help") == 0)
 		display_help_command();  /* Display help information for help command */
-	else if (_strcmp(datash->args[1], "exit") == 0)
+	else if (compare_strings(datash->args[1], "exit") == 0)
 		display_exit_help();  /* Display help information for exit command */
-	else if (_strcmp(datash->args[1], "cd") == 0)
+	else if (compare_strings(datash->args[1], "cd") == 0)
 		display_cd_help();  /* Display help information for cd command */
-	else if (_strcmp(datash->args[1], "alias") == 0)
+	else if (compare_strings(datash->args[1], "alias") == 0)
 		display_alias_help();  /* Display help information for alias command */
 	else
 		write(STDERR_FILENO, datash->args[0],

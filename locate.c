@@ -16,4 +16,5 @@ char *locate_char(char *str, char searchChar)
 	if (*(str + charIndex) == searchChar)
 		return (str + charIndex);
 	return ('\0');
-} 
+}
+

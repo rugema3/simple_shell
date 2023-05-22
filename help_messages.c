@@ -99,4 +99,5 @@ void display_exit_help(void)
 	write(STDOUT_FILENO, helpText, _strlen(helpText));
 	helpText = "is that of the last command executed.\n";
 	write(STDOUT_FILENO, helpText, _strlen(helpText));
-} 
+}
+

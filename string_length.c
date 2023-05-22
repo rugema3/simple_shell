@@ -24,4 +24,4 @@ int prefix_length(char *str, char *acceptedChars)
 			break;
 	}
 	return (strIndex);
-}	
+}

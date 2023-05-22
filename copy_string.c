@@ -17,4 +17,4 @@ char *copy_string(char *destination, char *source)
 	destination[charIndex] = '\0';
 
 	return (destination);
-} 
+}
