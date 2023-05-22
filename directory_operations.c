@@ -136,7 +136,6 @@ void changeToPreviousDirectory(data_shell *datash)
 
 /**
  * changeDirectoryShell - changes current directory
- *
  * @datash: data relevant
  * Return: 1 on success
  */
@@ -153,7 +152,6 @@ int changeDirectoryShell(data_shell *datash)
 		isHome2 = compare_strings("~", directory);
 		isDoubleDash = compare_strings("--", directory);
 	}
-
 	/**
 	 *  If directory is not provided or matches "$HOME" or "~",
 	 *  change directory to home directory
@@ -163,24 +161,21 @@ int changeDirectoryShell(data_shell *datash)
 		changeToHomeDirectory(datash);
 		return (1);
 	}
-
 	/* If directory is "-", change directory to previous directory */
 	if (compare_strings("-", directory) == 0)
 	{
 		changeToPreviousDirectory(datash);
 		return (1);
 	}
-
 	/* If directory is "." or "..", change directory accordingly */
-	if (compare_strings(".", directory) == 0 || compare_strings("..", directory) == 0)
+	if (compare_strings(".", directory) == 0 ||
+			compare_strings("..", directory) == 0)
 	{
 		changeToParentDirectory(datash);
 		return (1);
 	}
-
 	/* Otherwise, change directory to the specified directory */
 	changeToDirectory(datash);
-
 	return (1);
 }
 
