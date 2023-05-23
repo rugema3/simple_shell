@@ -11,13 +11,14 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <limits.h>
-#include"struct.h"
+#include"struct.h" /* where the structs used in this project are located */
 #include"environment.h"
 
 #define BUFSIZE 1024
 #define TOK_BUFSIZE 128
 #define TOK_DELIM " \t\r\n\a"
 
+/* Function prototypes */
 
 sep_list *append_separator(sep_list **separatorHead, char separatorChar);
 void release_separator_memory(sep_list **separatorHead);
