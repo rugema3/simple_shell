@@ -1,98 +1,120 @@
-#ifndef SHELL_H
-#define SHELL_H
+#ifndef _SHELL_H_
+#define _SHELL_H_
 
-/**
- * terminate - Exits the shell.
- *
- * @datash: Pointer to the data_shell struct containing
- * relevant data (status and args).
- * Return: 0 on success.
- */
-int terminate(data_shell *datash)
-{
-	unsigned int exit_status;
-	int is_digit;
-	int str_len;
-	int is_big_number;
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <limits.h>
+#include"struct.h"
+#include"environment.h"
 
-	/* Check if an exit status is provided as an argument */
-	if (datash->args[1] != NULL)
-	{
-		exit_status = _atoi(datash->args[1]);
-		is_digit = _isdigit(datash->args[1]);
-		str_len = _strlen(datash->args[1]);
-		is_big_number = exit_status > (unsigned int)INT_MAX;
-
-		/* Validate the exit status argument */
-		if (!is_digit || str_len > 10 || is_big_number)
-		{
-			/* Display error message and set status to 2 */
-			handle_exit_status(datash, 2);
-			datash->status = 2;
-			return (1); /* Return 1 to indicate an error */
-		}
-
-		/* Set the exit status based on the provided argument */
-		datash->status = (exit_status % 256);
-	}
-
-	return (0); /* Return 0 on success */
-}
-/**
- * show_help_info - Displays help messages based on the given command.
- *
- * @datash: Pointer to the data_shell struct containing
- * relevant data (args and input).
- * Return: Always returns 1.
- */
-int show_help_info(data_shell *datash)
-{
-	if (datash->args[1] == 0)
-		display_general_help();  /* Display general help information */
-	else if (_strcmp(datash->args[1], "setenv") == 0)
-		display_setenv_help();  /* Display help information  */
-	else if (_strcmp(datash->args[1], "env") == 0)
-		display_env_help();  /* Display help information for env command */
-	else if (_strcmp(datash->args[1], "unsetenv") == 0)
-		display_unsetenv_help();  /* Display help information for unsetenv command */
-	else if (_strcmp(datash->args[1], "help") == 0)
-		display_help_command();  /* Display help information for help command */
-	else if (_strcmp(datash->args[1], "exit") == 0)
-		display_exit_help();  /* Display help information for exit command */
-	else if (_strcmp(datash->args[1], "cd") == 0)
-		display_cd_help();  /* Display help information for cd command */
-	else if (_strcmp(datash->args[1], "alias") == 0)
-		display_alias_help();  /* Display help information for alias command */
-	else
-		write(STDERR_FILENO, datash->args[0],
-		      _strlen(datash->args[0]));
-	/* Invalid command, display error message */
-
-	datash->status = 0;
-	return (1);
-}
+#define BUFSIZE 1024
+#define TOK_BUFSIZE 128
+#define TOK_DELIM " \t\r\n\a"
 
 
+sep_list *append_separator(sep_list **separatorHead, char separatorChar);
+void release_separator_memory(sep_list **separatorHead);
+line_list *append_line(line_list **lineHead, char *lineStr);
+void release_line_memory(line_list **lineHead);
+r_var *append(r_var **variableHead,
+		int varLength, char *value, int valueLength);
+void cleanup(r_var **variableHead);
+char *concatenate_strings(char *destination, const char *source);
+char *copy_string(char *destination, char *source);
+int compare_strings(char *str1, char *str2);
+char *locate_char(char *str, char searchChar);
+int prefix_length(char *str, char *acceptedChars);
+void copy_memory(void *dest_ptr, const void *src_ptr, unsigned int data_size);
 
-/**
- * main - Entry point
- *
- * @ac: argument count
- * @av: argument vector
- *
- * Return: 0 on success.
- */
-int main(int ac, char **av)
-{
-	data_shell datash;
-	(void) ac;
+void *resize_memory(void *old_ptr, unsigned int prev_size,
+		unsigned int new_size);
 
-	signal(SIGINT, prompt);
-	setup_data_shell(&datash, av);
-	interactive_shell(&datash);
-	deallocate_data_shell(&datash);
-	if (datash.status < 0)
-		return (255);
-	return (datash.status);
-}
+char **resize_double_ptr(char **old_ptr,
+		unsigned int prev_size, unsigned int new_size);
+
+char *split_str(char input_string[], const char *delimiter);
+int compare_characters(char input_string[], const char *delimiter);
+int get_str_length(const char *input_string);
+char *duplicate_str(const char *input_string);
+int is_digit(const char *input_string);
+void reverse_string(char *str);
+int count_char_repetition(char *input_str, int index);
+int find_syntax_errors(char *input_str, int index, char last_char);
+int locate_first_char(char *input_str, int *index_ptr);
+void output_syntax_error(data_shell *data_sh, char *input_str,
+		int index, int bool_flag);
+int validate_syntax(data_shell *data_sh, char *input_str);
+char *filterComments(char *in);
+void interactive_shell(data_shell *datash);
+char *getLineInput(int *isEof);
+char *swapCharacters(char *input, int bool);
+void addSeparatorsAndCommands(sep_list **head_s,
+		line_list **head_l, char *input);
+
+void goToNextCommand(sep_list **list_s, line_list **list_l,
+		data_shell *datash);
+
+int splitAndExecuteCommands(data_shell *datash, char *input);
+char **tokenizeInputString(char *input);
+
+char *replaceVariablesInInput(char *input, data_shell *datash);
+
+char *replaceStringWithVariables(r_var **head, char *input, char *newInput,
+		int newLength);
+
+int searchSpecialVariables(r_var **head, char *input,
+		char *status, data_shell *data);
+
+void searchEnvironmentVariable(r_var **head, char *input, data_shell *data);
+void assignLine(char **lineptr, size_t *size, char *buffer, size_t length);
+ssize_t readLine(char **lineptr, size_t *size, FILE *stream);
+int find_builtin(data_shell *datash);
+int executeCommand(data_shell *datash);
+int check_command_error(char *dir, data_shell *datash);
+int check_executable(data_shell *datash);
+char *find_executable_path(char *cmd, char **_environ);
+int check_colon_dir(char *path, int *index);
+void changeToParentDirectory(data_shell *datash);
+void changeToDirectory(data_shell *datash);
+void changeToPreviousDirectory(data_shell *datash);
+void changeToHomeDirectory(data_shell *datash);
+int changeDirectoryShell(data_shell *datash);
+int (*find_builtin_function(char *cmd))(data_shell *);
+int terminate(data_shell *datash);
+int calculate_length(int num);
+char *convert_int_to_string(int num);
+int convert_string_to_int(char *str);
+
+char *concatenate_cd_error(data_shell *data_sh, char *message,
+		char *error_output, char *counter_str);
+
+char *generate_not_found_error(data_shell *data_sh);
+char *generate_cd_error(data_shell *data_sh);
+char *generate_error_msg(data_shell *data_sh);
+char *error_get_alias(char **args);
+char *generate_env_error(data_shell *data_sh);
+char *error_syntax(char **args);
+char *error_permission(char **args);
+char *generate_permission_error(data_shell *data_sh);
+int handle_exit_status(data_shell *datash, int eval);
+void prompt(int sig);
+void display_env_help(void);
+void display_setenv_help(void);
+void display_unsetenv_help(void);
+void display_general_help(void);
+void display_exit_help(void);
+void display_help_command(void);
+void display_alias_help(void);
+void display_cd_help(void);
+int show_help_info(data_shell *datash);
+void deallocate_data_shell(data_shell *datash);
+void setup_data_shell(data_shell *datash, char **arguments);
+
 #endif /* SHELL_H */
