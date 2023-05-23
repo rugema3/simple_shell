@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * append - Append a variable node at the end of the list.
@@ -52,11 +52,11 @@ void display_help_command(void)
 {
 	char *helpText = "help: help [-dms] [pattern ...]\n";
 
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 	helpText = "\tDisplay information about builtin commands.\n";
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 	helpText = "Displays brief summaries of builtin commands.\n";
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 }
 
 /**
@@ -68,9 +68,9 @@ void display_alias_help(void)
 {
 	char *helpText = "alias: alias [-p] [name[=value]...]\n";
 
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 	helpText = "\tDefine or display aliases.\n";
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 }
 
 /**
@@ -81,8 +81,8 @@ void display_cd_help(void)
 {
 	char *helpText = "cd: cd [-L|[-P [-e]] [-@]] [dir]\n";
 
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 	helpText = "\tChange the shell working directory.\n";
-	write(STDOUT_FILENO, helpText, _strlen(helpText));
+	write(STDOUT_FILENO, helpText,  get_str_length(helpText));
 }
 

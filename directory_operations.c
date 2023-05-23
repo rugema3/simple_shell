@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * changeToParentDirectory - changes to the parent directory
@@ -10,15 +10,15 @@
 void changeToParentDirectory(data_shell *datash)
 {
 	char pwd[PATH_MAX];
-	char *dir, *cp_pwd, *cp_strtok_pwd;
+	char *dir, *cp_pwd, *cpsplit_str_pwd;
 
 	getcwd(pwd, sizeof(pwd));
-	cp_pwd = _strdup(pwd);
-	set_env("OLDPWD", cp_pwd, datash);
+	cp_pwd = duplicate_str(pwd);
+	change_env_variable("OLDPWD", cp_pwd, datash);
 	dir = datash->args[1];
 	if (compare_strings(".", dir) == 0)
 	{
-		set_env("PWD", cp_pwd, datash);
+		change_env_variable("PWD", cp_pwd, datash);
 		free(cp_pwd);
 		return;
 	}
@@ -27,25 +27,25 @@ void changeToParentDirectory(data_shell *datash)
 		free(cp_pwd);
 		return;
 	}
-	cp_strtok_pwd = cp_pwd;
-	rev_string(cp_strtok_pwd);
-	cp_strtok_pwd = _strtok(cp_strtok_pwd, "/");
-	if (cp_strtok_pwd != NULL)
+	cpsplit_str_pwd = cp_pwd;
+	reverse_string(cpsplit_str_pwd);
+	cpsplit_str_pwd = split_str(cpsplit_str_pwd, "/");
+	if (cpsplit_str_pwd != NULL)
 	{
-		cp_strtok_pwd = _strtok(NULL, "\0");
+		cpsplit_str_pwd = split_str(NULL, "\0");
 
-		if (cp_strtok_pwd != NULL)
-			rev_string(cp_strtok_pwd);
+		if (cpsplit_str_pwd != NULL)
+			reverse_string(cpsplit_str_pwd);
 	}
-	if (cp_strtok_pwd != NULL)
+	if (cpsplit_str_pwd != NULL)
 	{
-		chdir(cp_strtok_pwd);
-		set_env("PWD", cp_strtok_pwd, datash);
+		chdir(cpsplit_str_pwd);
+		change_env_variable("PWD", cpsplit_str_pwd, datash);
 	}
 	else
 	{
 		chdir("/");
-		set_env("PWD", "/", datash);
+		change_env_variable("PWD", "/", datash);
 	}
 	datash->status = 0;
 	free(cp_pwd);
@@ -72,11 +72,11 @@ void changeToDirectory(data_shell *datash)
 		return;
 	}
 
-	cp_pwd = _strdup(pwd);
-	set_env("OLDPWD", cp_pwd, datash);
+	cp_pwd = duplicate_str(pwd);
+	change_env_variable("OLDPWD", cp_pwd, datash);
 
-	cp_dir = _strdup(dir);
-	set_env("PWD", cp_dir, datash);
+	cp_dir = duplicate_str(dir);
+	change_env_variable("PWD", cp_dir, datash);
 
 	free(cp_pwd);
 	free(cp_dir);
@@ -100,9 +100,9 @@ void changeToPreviousDirectory(data_shell *datash)
 
 	getcwd(current_pwd, sizeof(current_pwd));
 	/* Get the current working directory */
-	copied_pwd = _strdup(current_pwd);
+	copied_pwd = duplicate_str(current_pwd);
 	/* Create a copy of the current working directory */
-	env_oldpwd = _getenv("OLDPWD", datash->_environ);
+	env_oldpwd = get_environment_variable("OLDPWD", datash->_environ);
 	/* Get the value of the environment variable OLDPWD */
 	if (env_oldpwd == NULL)
 		copied_oldpwd = copied_pwd;
@@ -111,16 +111,16 @@ void changeToPreviousDirectory(data_shell *datash)
 	 *  directory as the previous directory
 	 */
 	else
-		copied_oldpwd = _strdup(env_oldpwd);
+		copied_oldpwd = duplicate_str(env_oldpwd);
 	/* Create a copy of the previous working directory */
-	set_env("OLDPWD", copied_pwd, datash);
+	change_env_variable("OLDPWD", copied_pwd, datash);
 	/* Set the environment variable OLDPWD to the current working directory */
 	if (chdir(copied_oldpwd) == -1)
-		set_env("PWD", copied_pwd, datash);
+		change_env_variable("PWD", copied_pwd, datash);
 	else
-		set_env("PWD", copied_oldpwd, datash);
-	previous_pwd = _getenv("PWD", datash->_environ);
-	write(STDOUT_FILENO, previous_pwd, _strlen(previous_pwd));
+		change_env_variable("PWD", copied_oldpwd, datash);
+	previous_pwd = get_environment_variable("PWD", datash->_environ);
+	write(STDOUT_FILENO, previous_pwd,  get_str_length(previous_pwd));
 	/* Write the new current directory path */
 	write(STDOUT_FILENO, "\n", 1); /* Write a new line character */
 	free(copied_pwd);
@@ -136,6 +136,7 @@ void changeToPreviousDirectory(data_shell *datash)
 
 /**
  * changeDirectoryShell - changes current directory
+ *
  * @datash: data relevant
  * Return: 1 on success
  */
@@ -194,13 +195,13 @@ void changeToHomeDirectory(data_shell *datash)
 
 	getcwd(current_pwd, sizeof(current_pwd));
 
-	previous_pwd = _strdup(current_pwd);
+	previous_pwd = duplicate_str(current_pwd);
 
-	home_directory = _getenv("HOME", datash->_environ);
+	home_directory = get_environment_variable("HOME", datash->_environ);
 
 	if (home_directory == NULL)
 	{
-		set_env("OLDPWD", previous_pwd, datash);
+		change_env_variable("OLDPWD", previous_pwd, datash);
 		free(previous_pwd);
 		return;
 	}
@@ -214,8 +215,8 @@ void changeToHomeDirectory(data_shell *datash)
 		return;
 	}
 
-	set_env("OLDPWD", previous_pwd, datash);
-	set_env("PWD", home_directory, datash);
+	change_env_variable("OLDPWD", previous_pwd, datash);
+	change_env_variable("PWD", home_directory, datash);
 
 	free(previous_pwd);
 	datash->status = 0;

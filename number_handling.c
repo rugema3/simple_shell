@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * calculate_length - Get the length of a number.
@@ -98,4 +98,5 @@ int convert_string_to_int(char *str)
 		multiplier /= 10;
 	}
 	return (output * sign);
-} 
+}
+

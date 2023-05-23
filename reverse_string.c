@@ -1,4 +1,4 @@
-#include"main.h"
+#include"shell.h"
 
 /**
  * reverse_string - Reverses a string.
@@ -43,4 +43,5 @@ void reverse_string(char *str)
 			*(str_ptr + (swap_idx - 1)) = swap_char;
 		}
 	}
-} 
+}
+

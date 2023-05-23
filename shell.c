@@ -1,4 +1,4 @@
-#include"main.h"
+#include"shell.h"
 
 /**
  * terminate - Exits the shell.
@@ -10,20 +10,20 @@
 int terminate(data_shell *datash)
 {
 	unsigned int exit_status;
-	int is_digit;
+	int is_num;
 	int str_len;
 	int is_big_number;
 
 	/* Check if an exit status is provided as an argument */
 	if (datash->args[1] != NULL)
 	{
-		exit_status = _atoi(datash->args[1]);
-		is_digit = _isdigit(datash->args[1]);
-		str_len = _strlen(datash->args[1]);
+		exit_status = convert_string_to_int(datash->args[1]);
+		is_num = is_digit(datash->args[1]);
+		str_len =  get_str_length(datash->args[1]);
 		is_big_number = exit_status > (unsigned int)INT_MAX;
 
 		/* Validate the exit status argument */
-		if (!is_digit || str_len > 10 || is_big_number)
+		if (!is_num || str_len > 10 || is_big_number)
 		{
 			/* Display error message and set status to 2 */
 			handle_exit_status(datash, 2);
@@ -64,7 +64,7 @@ int show_help_info(data_shell *datash)
 		display_alias_help();  /* Display help information for alias command */
 	else
 		write(STDERR_FILENO, datash->args[0],
-		      _strlen(datash->args[0]));
+		       get_str_length(datash->args[0]));
 	/* Invalid command, display error message */
 
 	datash->status = 0;

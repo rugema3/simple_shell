@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * swapCharacters - swaps | and & for non-printed chars
@@ -71,11 +71,11 @@ void addSeparatorsAndCommands(sep_list **separatorListHead,
 		}
 	}
 
-	line = _strtok(input, ";|&");
+	line = split_str(input, ";|&");
 	do {
 		line = swapCharacters(line, 1);
 		append_line(commandListHead, line);
-		line = _strtok(NULL, ";|&");
+		line = split_str(NULL, ";|&");
 	} while (line != NULL);
 
 }
@@ -191,7 +191,7 @@ char **tokenizeInputString(char *input)
 		exit(EXIT_FAILURE);
 	}
 
-	token = _strtok(input, TOK_DELIM);
+	token = split_str(input, TOK_DELIM);
 	tokens[0] = token;
 
 	for (i = 1; token != NULL; i++)
@@ -199,14 +199,14 @@ char **tokenizeInputString(char *input)
 		if (i == bsize)
 		{
 			bsize += TOK_BUFSIZE;
-			tokens = _reallocdp(tokens, i, sizeof(char *) * bsize);
+			tokens = resize_double_ptr(tokens, i, sizeof(char *) * bsize);
 			if (tokens == NULL)
 			{
 				write(STDERR_FILENO, ": allocation error\n", 18);
 				exit(EXIT_FAILURE);
 			}
 		}
-		token = _strtok(NULL, TOK_DELIM);
+		token = split_str(NULL, TOK_DELIM);
 		tokens[i] = token;
 	}
 

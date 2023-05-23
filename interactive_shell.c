@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * filterComments - deletes comments from the input
@@ -28,7 +28,7 @@ char *filterComments(char *input)
 
 	if (up_to != 0)
 	{
-		input = _realloc(input, i, up_to + 1);
+		input = resize_memory(input, i, up_to + 1);
 		input[up_to] = '\0';
 	}
 
@@ -57,7 +57,7 @@ void interactive_shell(data_shell *datash)
 			if (input == NULL)
 				continue;
 
-			if (check_syntax_error(datash, input) == 1)
+			if (validate_syntax(datash, input) == 1)
 			{
 				datash->status = 2;
 				free(input);
@@ -161,7 +161,7 @@ ssize_t readLine(char **lineptr, size_t *size, FILE *stream)
 			break;
 		}
 		if (input >= BUFSIZE)
-			buffer = _realloc(buffer, input, input + 1);
+			buffer = resize_memory(buffer, input, input + 1);
 		buffer[input] = t;
 		input++;
 	}

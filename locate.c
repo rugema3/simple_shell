@@ -1,4 +1,4 @@
-#include"main.h"
+#include"shell.h"
 
 /**
  * locate_char - locates a character in a string,

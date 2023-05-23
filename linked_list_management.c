@@ -1,4 +1,4 @@
-#include"main.h"
+#include"shell.h"
 
 /**
  * append_rvar_element - Appends a new node to a r_var linked list.
@@ -66,4 +66,5 @@ void empty_rvar_list(r_var **list_head)
 		/* Set the head to NULL indicating the list is empty */
 		*list_head = NULL;
 	}
-} 
+}
+

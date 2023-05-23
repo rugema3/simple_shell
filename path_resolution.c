@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * check_colon_dir - Checks if ":" is in the current directory.
@@ -31,19 +31,19 @@ char *find_executable_path(char *cmd, char **_environ)
 	int len_dir, len_cmd, i;
 	struct stat st;
 
-	path = _getenv("PATH", _environ);
+	path = get_environment_variable("PATH", _environ);
 	if (path)
 	{
-		ptr_path = _strdup(path);
-		len_cmd = _strlen(cmd);
-		token_path = _strtok(ptr_path, ":");
+		ptr_path = duplicate_str(path);
+		len_cmd =  get_str_length(cmd);
+		token_path = split_str(ptr_path, ":");
 		i = 0;
 		while (token_path != NULL)
 		{
 			if (check_colon_dir(path, &i))
 				if (stat(cmd, &st) == 0)
 					return (cmd);
-			len_dir = _strlen(token_path);
+			len_dir =  get_str_length(token_path);
 			dir = malloc(len_dir + len_cmd + 2);
 			copy_string(dir, token_path);
 			concatenate_strings(dir, "/");
@@ -55,7 +55,7 @@ char *find_executable_path(char *cmd, char **_environ)
 				return (dir);
 			}
 			free(dir);
-			token_path = _strtok(NULL, ":");
+			token_path = split_str(NULL, ":");
 		}
 		free(ptr_path);
 		if (stat(cmd, &st) == 0)

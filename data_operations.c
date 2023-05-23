@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * prompt - Handles the Ctrl+C signal in the prompt.
@@ -55,11 +55,11 @@ void setup_data_shell(data_shell *datash, char **av)
 
 	for (index = 0; environ[index]; index++)
 	{
-		datash->_environ[index] = _strdup(environ[index]);
+		datash->_environ[index] = duplicate_str(environ[index]);
 	}
 
 	datash->_environ[index] = NULL;
-	datash->pid = aux_itoa(getpid());
+	datash->pid = convert_int_to_string(getpid());
 }
 /**
  * handle_exit_status - Handles the exit status and prints
@@ -74,22 +74,22 @@ int handle_exit_status(data_shell *datash, int eval)
 	char *error = NULL;
 
 	if (eval == -1)
-		error = error_env(datash);
+		error = generate_env_error(datash);
 	else if (eval == 126)
-		error = error_path_126(datash);
+		error = generate_permission_error(datash);
 	else if (eval == 127)
-		error = error_not_found(datash);
+		error = generate_not_found_error(datash);
 	else if (eval == 2)
 	{
 		if (compare_strings("exit", datash->args[0]) == 0)
-			error = error_exit_shell(datash);
+			error = generate_error_msg(datash);
 		else if (compare_strings("cd", datash->args[0]) == 0)
-			error = error_get_cd(datash);
+			error = generate_cd_error(datash);
 	}
 
 	if (error != NULL)
 	{
-		write(STDERR_FILENO, error, _strlen(error));
+		write(STDERR_FILENO, error,  get_str_length(error));
 		free(error);
 	}
 
@@ -107,10 +107,10 @@ int handle_exit_status(data_shell *datash, int eval)
 int (*find_builtin_function(char *cmd))(data_shell *)
 {
 	builtin_t builtin[] = {
-		{ "env", _env },
+		{ "env", print_environment_variables },
 		{ "exit", terminate },
-		{ "setenv", _setenv },
-		{ "unsetenv", _unsetenv },
+		{ "setenv", Update_environment },
+		{ "unsetenv", erase_env_variable },
 		{ "cd", changeDirectoryShell },
 		{ "help", show_help_info },
 		{ NULL, NULL }	};

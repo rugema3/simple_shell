@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * copy_memory - Copies information between void pointers.
@@ -91,3 +91,4 @@ char **resize_double_ptr(char **old_ptr, unsigned int prev_size,
 
 	return (new_ptr);
 }
+

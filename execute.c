@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 /**
  * find_builtin - Finds and executes built-in commands.
@@ -39,7 +39,7 @@ void searchEnvironmentVariable(r_var **head, char *input, data_shell *data)
 		{
 			if (environment[row][chr] == '=')
 			{
-				val_len = _strlen(environment[row] + chr + 1);
+				val_len =  get_str_length(environment[row] + chr + 1);
 				append(head, j, environment[row] + chr + 1, val_len);
 				return;
 			}
@@ -75,8 +75,8 @@ char *status, data_shell *data)
 {
 	int i, status_len, pid_len;
 
-	status_len = _strlen(status);
-	pid_len = _strlen(data->pid);
+	status_len =  get_str_length(status);
+	pid_len =  get_str_length(data->pid);
 
 	for (i = 0; input[i]; i++)
 	{
@@ -160,7 +160,7 @@ char *replaceVariablesInInput(char *input, data_shell *datash)
 	char *status, *newInput;
 	int originalLen, newLen;
 
-	status = aux_itoa(datash->status);
+	status = convert_int_to_string(datash->status);
 	head = NULL;
 
 	originalLen = searchSpecialVariables(&head, input, status, datash);
