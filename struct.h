@@ -1,7 +1,7 @@
 #ifndef _STRUCT_H_
 #define _STRUCT_H_
 
-#include"main.h"
+#include"shell.h"
 
 /* structs' list */
 /**
@@ -76,4 +76,4 @@ typedef struct builtin_s
 	int (*f)(data_shell *datash);
 } builtin_t;
 
-#endif 
+#endif
