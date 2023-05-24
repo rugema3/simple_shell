@@ -17,7 +17,7 @@
 #define BUFSIZE 1024
 #define TOK_BUFSIZE 128
 #define TOK_DELIM " \t\r\n\a"
-
+#define EXIT_STATUS_MOD 256
 
 custom_separator_node_t *append_separator
 	(custom_separator_node_t **separatorHead, char separatorChar);

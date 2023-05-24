@@ -9,10 +9,10 @@
  */
 int terminate(CustomShellData_t *datash)
 {
-	unsigned int exit_status;
-	int is_num;
-	int str_len;
-	int is_big_number;
+	unsigned int exit_status = 0;
+	int is_num = 0;
+	int str_len = 0;
+	int is_big_number = 0;
 
 	/* Check if an exit status is provided as an argument */
 	if (datash->parsed_arguments[1] != NULL)
@@ -20,7 +20,7 @@ int terminate(CustomShellData_t *datash)
 		exit_status = convert_string_to_int(datash->parsed_arguments[1]);
 		is_num = is_digit(datash->parsed_arguments[1]);
 		str_len =  get_str_length(datash->parsed_arguments[1]);
-		is_big_number = exit_status > (unsigned int)INT_MAX;
+		is_big_number = exit_status > UINT_MAX;
 
 		/* Validate the exit status argument */
 		if (!is_num || str_len > 10 || is_big_number)
@@ -32,11 +32,12 @@ int terminate(CustomShellData_t *datash)
 		}
 
 		/* Set the exit status based on the provided argument */
-		datash->operation_status = (exit_status % 256);
+		datash->operation_status = (exit_status % EXIT_STATUS_MOD);
 	}
 
 	return (0); /* Return 0 on success */
 }
+
 /**
  * show_help_info - Displays help messages based on the given command.
  *
