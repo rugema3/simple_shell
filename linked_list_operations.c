@@ -5,10 +5,10 @@
  *
  * @variableHead: Pointer to the head of the variable list.
  */
-void cleanup(r_var **variableHead)
+void cleanup(custom_var_list_t **variableHead)
 {
-	r_var *tempVariable;
-	r_var *currentVariable;
+	custom_var_list_t *tempVariable;
+	custom_var_list_t *currentVariable;
 
 	if (variableHead != NULL)
 	{
@@ -29,15 +29,16 @@ void cleanup(r_var **variableHead)
  * @separatorChar: Separator character to be added.
  * Return: Pointer to the updated head of the separator list.
  */
-sep_list *append_separator(sep_list **separatorHead, char separatorChar)
+custom_separator_node_t *append_separator(custom_separator_node_t
+		**separatorHead, char separatorChar)
 {
-	sep_list *newSeparator, *tempSeparator;
+	custom_separator_node_t *newSeparator, *tempSeparator;
 
-	newSeparator = malloc(sizeof(sep_list));
+	newSeparator = malloc(sizeof(custom_separator_node_t));
 	if (newSeparator == NULL)
 		return (NULL);
 
-	newSeparator->separator = separatorChar;
+	newSeparator->custom_character = separatorChar;
 	newSeparator->next = NULL;
 	tempSeparator = *separatorHead;
 
@@ -61,10 +62,10 @@ sep_list *append_separator(sep_list **separatorHead, char separatorChar)
  *
  * @separatorHead: Pointer to the head of the separator list.
  */
-void release_separator_memory(sep_list **separatorHead)
+void release_separator_memory(custom_separator_node_t **separatorHead)
 {
-	sep_list *tempSeparator;
-	sep_list *currSeparator;
+	custom_separator_node_t *tempSeparator;
+	custom_separator_node_t *currSeparator;
 
 	if (separatorHead != NULL)
 	{
@@ -85,15 +86,15 @@ void release_separator_memory(sep_list **separatorHead)
  * @lineStr: Line to be added.
  * Return: Pointer to the updated head of the line list.
  */
-line_list *append_line(line_list **lineHead, char *lineStr)
+custom_line_list_t *append_line(custom_line_list_t **lineHead, char *lineStr)
 {
-	line_list *newLine, *tempLine;
+	custom_line_list_t *newLine, *tempLine;
 
-	newLine = malloc(sizeof(line_list));
+	newLine = malloc(sizeof(custom_line_list_t));
 	if (newLine == NULL)
 		return (NULL);
 
-	newLine->line = lineStr;
+	newLine->text = lineStr;
 	newLine->next = NULL;
 	tempLine = *lineHead;
 
@@ -116,10 +117,10 @@ line_list *append_line(line_list **lineHead, char *lineStr)
  *
  * @lineHead: Pointer to the head of the line list.
  */
-void release_line_memory(line_list **lineHead)
+void release_line_memory(custom_line_list_t **lineHead)
 {
-	line_list *tempLine;
-	line_list *currLine;
+	custom_line_list_t *tempLine;
+	custom_line_list_t *currLine;
 
 	if (lineHead != NULL)
 	{

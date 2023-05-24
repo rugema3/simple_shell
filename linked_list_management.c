@@ -1,28 +1,28 @@
 #include"shell.h"
 
 /**
- * append_rvar_element - Appends a new node to a r_var linked list.
+ * append_rvar_element - Appends a new node to a custom_var_list_t linked list.
  * @list_head: Pointer to the head of the list.
  * @var_length: Length of the variable.
- * @val: Value of the variable.
+ * @variable_value: Value of the variable.
  * @value_length: Length of the value.
  *
  * Return: Pointer to the head of the list.
  */
-r_var *append_rvar_element(r_var **list_head,
-		int var_length, char *val, int value_length)
+custom_var_list_t *append_rvar_element(custom_var_list_t **list_head,
+		int var_length, char *variable_value, int value_length)
 {
-	r_var *new_node, *temp_node;
+	custom_var_list_t *new_node, *temp_node;
 
 	/* Allocating memory for the new node */
-	new_node = malloc(sizeof(r_var));
+	new_node = malloc(sizeof(custom_var_list_t));
 	if (new_node == NULL)
 		return (NULL);
 
 	/* Initializing the new node */
-	new_node->len_var = var_length;
-	new_node->val = val;
-	new_node->len_val = value_length;
+	new_node->variable_length = var_length;
+	new_node->variable_value = variable_value;
+	new_node->value_length = value_length;
 	new_node->next = NULL;
 
 	/* If the list is empty, make the new node as the head */
@@ -44,15 +44,15 @@ r_var *append_rvar_element(r_var **list_head,
 }
 
 /**
- * empty_rvar_list - Frees a r_var list.
+ * empty_rvar_list - Frees a custom_var_list_t list.
  * @list_head: Pointer to the head of the list.
  *
  * Return: Nothing.
  */
-void empty_rvar_list(r_var **list_head)
+void empty_rvar_list(custom_var_list_t **list_head)
 {
-	r_var *temp_node;
-	r_var *current_node;
+	custom_var_list_t *temp_node;
+	custom_var_list_t *current_node;
 
 	if (list_head != NULL)
 	{

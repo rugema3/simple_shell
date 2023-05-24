@@ -74,13 +74,13 @@ char *find_executable_path(char *cmd, char **_environ)
  * @datash: Data structure
  * Return: 0 if it is not an executable, other number if it is.
  */
-int check_executable(data_shell *datash)
+int check_executable(CustomShellData_t *datash)
 {
 	struct stat st;
 	int i;
 	char *input;
 
-	input = datash->args[0];
+	input = datash->parsed_arguments[0];
 	for (i = 0; input[i]; i++)
 	{
 		switch (input[i])
@@ -123,7 +123,7 @@ int check_executable(data_shell *datash)
  * @datash: Data structure
  * Return: 1 if there is an error, 0 if not
  */
-int check_command_error(char *dir, data_shell *datash)
+int check_command_error(char *dir, CustomShellData_t *datash)
 {
 	if (dir == NULL)
 	{
@@ -131,7 +131,7 @@ int check_command_error(char *dir, data_shell *datash)
 		return (1);
 	}
 
-	if (compare_strings(datash->args[0], dir) != 0)
+	if (compare_strings(datash->parsed_arguments[0], dir) != 0)
 	{
 		if (access(dir, X_OK) == -1)
 		{
@@ -143,7 +143,7 @@ int check_command_error(char *dir, data_shell *datash)
 	}
 	else
 	{
-		if (access(datash->args[0], X_OK) == -1)
+		if (access(datash->parsed_arguments[0], X_OK) == -1)
 		{
 			handle_exit_status(datash, 126);
 			return (1);
@@ -159,12 +159,10 @@ int check_command_error(char *dir, data_shell *datash)
  * @datash: Data structure containing relevant data (args and input)
  * Return: 1 on success.
  */
-int executeCommand(data_shell *datash)
+int executeCommand(CustomShellData_t *datash)
 {
-	pid_t pd;
-	pid_t wpd;
-	int state;
-	int exec;
+	pid_t pd, wpd;
+	int state, exec;
 	char *dir;
 	(void) wpd;
 
@@ -173,7 +171,7 @@ int executeCommand(data_shell *datash)
 		return (1);
 	if (exec == 0)
 	{
-		dir = find_executable_path(datash->args[0], datash->_environ);
+		dir = find_executable_path(datash->parsed_arguments[0], datash->environment);
 		if (check_command_error(dir, datash) == 1)
 			return (1);
 	}
@@ -182,14 +180,15 @@ int executeCommand(data_shell *datash)
 	if (pd == 0)
 	{
 		if (exec == 0)
-			dir = find_executable_path(datash->args[0], datash->_environ);
+			dir = find_executable_path(datash->parsed_arguments[0],
+					datash->environment);
 		else
-			dir = datash->args[0];
-		execve(dir + exec, datash->args, datash->_environ);
+			dir = datash->parsed_arguments[0];
+		execve(dir + exec, datash->parsed_arguments, datash->environment);
 	}
 	else if (pd < 0)
 	{
-		perror(datash->av[0]);
+		perror(datash->arguments[0]);
 		return (1);
 	}
 	else
@@ -198,8 +197,7 @@ int executeCommand(data_shell *datash)
 			wpd = waitpid(pd, &state, WUNTRACED);
 		} while (!WIFEXITED(state) && !WIFSIGNALED(state));
 	}
-
-	datash->status = state / 256;
+	datash->operation_status = state / 256;
 	return (1);
 }
 

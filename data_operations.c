@@ -12,64 +12,66 @@ void prompt(int sig)
 }
 
 /**
- * deallocate_data_shell - Frees the resources used by
- * the data_shell structure.
+ * deallocate_CustomShellData_t - Frees the resources used by
+ * the CustomShellData_t structure.
  *
- * @datash: Pointer to the data_shell structure.
+ * @datash: Pointer to the CustomShellData_t structure.
  * Return: No return.
  */
-void deallocate_data_shell(data_shell *datash)
+void deallocate_CustomShellData_t(CustomShellData_t *datash)
 {
 	size_t index;
 
-	for (index = 0; datash->_environ[index]; index++)
+	for (index = 0; datash->environment[index]; index++)
 	{
-		free(datash->_environ[index]);
+		free(datash->environment[index]);
 	}
 
-	free(datash->_environ);
-	free(datash->pid);
+	free(datash->environment);
+	free(datash->process_identifier);
 }
 
 /**
- * setup_data_shell - Initializes the data_shell structure with default values.
+ * setup_CustomShellData_t - Initializes the CustomShellData_t
+ * structure with default values.
  *
- * @datash: Pointer to the data_shell structure.
- * @av: Argument vector.
+ * @datash: Pointer to the CustomShellData_t structure.
+ * @arguments: Argument vector.
  * Return: No return.
  */
-void setup_data_shell(data_shell *datash, char **av)
+void setup_CustomShellData_t(CustomShellData_t *datash, char **arguments)
 {
 	size_t index;
 
-	datash->av = av;
-	datash->input = NULL;
-	datash->args = NULL;
-	datash->status = 0;
-	datash->counter = 1;
+	datash->arguments = arguments;
+	datash->input_data = NULL;
+	datash->parsed_arguments = NULL;
+	datash->operation_status = 0;
+	datash->counter_value = 1;
 
 	for (index = 0; environ[index]; index++)
 		;
 
-	datash->_environ = malloc(sizeof(char *) * (index + 1));
+	datash->environment = malloc(sizeof(char *) * (index + 1));
 
 	for (index = 0; environ[index]; index++)
 	{
-		datash->_environ[index] = duplicate_str(environ[index]);
+		datash->environment[index] = duplicate_str(environ[index]);
 	}
 
-	datash->_environ[index] = NULL;
-	datash->pid = convert_int_to_string(getpid());
+	datash->environment[index] = NULL;
+	datash->process_identifier = convert_int_to_string(getpid());
 }
 /**
  * handle_exit_status - Handles the exit status and prints
  * the corresponding error message.
  *
- * @datash: Pointer to the data_shell struct containing relevant data (args).
+ * @datash: Pointer to the CustomShellData_t struct
+ * containing relevant data (args).
  * @eval: The exit status value.
  * Return: The exit status value.
  */
-int handle_exit_status(data_shell *datash, int eval)
+int handle_exit_status(CustomShellData_t *datash, int eval)
 {
 	char *error = NULL;
 
@@ -81,9 +83,9 @@ int handle_exit_status(data_shell *datash, int eval)
 		error = generate_not_found_error(datash);
 	else if (eval == 2)
 	{
-		if (compare_strings("exit", datash->args[0]) == 0)
+		if (compare_strings("exit", datash->parsed_arguments[0]) == 0)
 			error = generate_error_msg(datash);
-		else if (compare_strings("cd", datash->args[0]) == 0)
+		else if (compare_strings("cd", datash->parsed_arguments[0]) == 0)
 			error = generate_cd_error(datash);
 	}
 
@@ -93,7 +95,7 @@ int handle_exit_status(data_shell *datash, int eval)
 		free(error);
 	}
 
-	datash->status = eval;
+	datash->operation_status = eval;
 	return (eval);
 }
 
@@ -104,9 +106,9 @@ int handle_exit_status(data_shell *datash, int eval)
  * @cmd: The name of the built-in command.
  * Return: Pointer to the corresponding function, or NULL if not found.
  */
-int (*find_builtin_function(char *cmd))(data_shell *)
+int (*find_builtin_function(char *cmd))(CustomShellData_t *)
 {
-	builtin_t builtin[] = {
+	custom_builtin_t builtin[] = {
 		{ "env", print_environment_variables },
 		{ "exit", terminate },
 		{ "setenv", Update_environment },
@@ -116,10 +118,10 @@ int (*find_builtin_function(char *cmd))(data_shell *)
 		{ NULL, NULL }	};
 	int index = 0;
 
-	while (builtin[index].name)
+	while (builtin[index].command_name)
 	{
-		if (compare_strings(builtin[index].name, cmd) == 0)
-			return (builtin[index].f);
+		if (compare_strings(builtin[index].command_name, cmd) == 0)
+			return (builtin[index].function_ptr);
 		index++;
 	}
 

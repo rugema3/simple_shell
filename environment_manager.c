@@ -32,19 +32,19 @@ char *build_new_entry(char *name, char *value)
  * @datash: data structure (environ)
  * Return: no return
  */
-void change_env_variable(char *name, char *value, data_shell *datash)
+void change_env_variable(char *name, char *value, CustomShellData_t *datash)
 {
 	int i = 0;
 	char *var_entry, *name_entry;
 
-	while (datash->_environ[i])
+	while (datash->environment[i])
 	{
-		var_entry = duplicate_str(datash->_environ[i]);
+		var_entry = duplicate_str(datash->environment[i]);
 		name_entry = split_str(var_entry, "=");
 		if (compare_strings(name_entry, name) == 0)
 		{
-			free(datash->_environ[i]);
-			datash->_environ[i] = build_new_entry(name_entry, value);
+			free(datash->environment[i]);
+			datash->environment[i] = build_new_entry(name_entry, value);
 			free(var_entry);
 			return;
 		}
@@ -52,10 +52,10 @@ void change_env_variable(char *name, char *value, data_shell *datash)
 		i++;
 	}
 
-	datash->_environ = resize_double_ptr(datash->_environ, i,
+	datash->environment = resize_double_ptr(datash->environment, i,
 			sizeof(char *) * (i + 2));
-	datash->_environ[i] = build_new_entry(name, value);
-	datash->_environ[i + 1] = NULL;
+	datash->environment[i] = build_new_entry(name, value);
+	datash->environment[i + 1] = NULL;
 }
 /**
  * compare_environment_variable_name - compares env variables names
@@ -122,23 +122,24 @@ char *get_environment_variable(const char *input_name, char **_environ)
  * @datash: data relevant.
  * Return: 1 on success.
  */
-int print_environment_variables(data_shell *datash)
+int print_environment_variables(CustomShellData_t *datash)
 {
 	int outer_loop_index = 0, inner_loop_index = 0;
 
-	while (datash->_environ[outer_loop_index])
+	while (datash->environment[outer_loop_index])
 	{
 		inner_loop_index = 0;
-		while (datash->_environ[outer_loop_index][inner_loop_index])
+		while (datash->environment[outer_loop_index][inner_loop_index])
 		{
 			inner_loop_index++;
 		}
 
-		write(STDOUT_FILENO, datash->_environ[outer_loop_index], inner_loop_index);
+		write(STDOUT_FILENO, datash->environment[outer_loop_index],
+				inner_loop_index);
 		write(STDOUT_FILENO, "\n", 1);
 		outer_loop_index++;
 	}
-	datash->status = 0;
+	datash->operation_status = 0;
 
 	return (1);
 }

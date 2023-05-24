@@ -10,18 +10,18 @@
  *
  * Return: Pointer to the updated head of the variable list.
  */
-r_var *append(r_var **variableHead, int varLength,
+custom_var_list_t *append(custom_var_list_t **variableHead, int varLength,
 		char *value, int valueLength)
 {
-	r_var *newVariable, *tempVariable;
+	custom_var_list_t *newVariable, *tempVariable;
 
-	newVariable = malloc(sizeof(r_var));
+	newVariable = malloc(sizeof(custom_var_list_t));
 	if (newVariable == NULL)
 		return (NULL);
 
-	newVariable->len_var = varLength;
-	newVariable->val = value;
-	newVariable->len_val = valueLength;
+	newVariable->variable_length = varLength;
+	newVariable->variable_value = value;
+	newVariable->value_length = valueLength;
 
 	newVariable->next = NULL;
 	tempVariable = *variableHead;

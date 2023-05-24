@@ -41,7 +41,7 @@ char *filterComments(char *input)
  *
  * Return: void
  */
-void interactive_shell(data_shell *datash)
+void interactive_shell(CustomShellData_t *datash)
 {
 	int iterate, isEof;
 	char *input;
@@ -59,13 +59,13 @@ void interactive_shell(data_shell *datash)
 
 			if (validate_syntax(datash, input) == 1)
 			{
-				datash->status = 2;
+				datash->operation_status = 2;
 				free(input);
 				continue;
 			}
 			input = replaceVariablesInInput(input, datash);
 			iterate = splitAndExecuteCommands(datash, input);
-			datash->counter += 1;
+			datash->counter_value += 1;
 			free(input);
 		}
 		else

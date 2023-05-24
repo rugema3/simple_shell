@@ -61,7 +61,7 @@ int find_syntax_errors(char *input_str, int index, char last_char)
  * @bool_flag: to control msg error
  * Return: no return
  */
-void output_syntax_error(data_shell *data_sh, char *input_str,
+void output_syntax_error(CustomShellData_t *data_sh, char *input_str,
 		int index, int bool_flag)
 {
 	char *syntax_msg, *syntax_msg2, *syntax_msg3, *error_msg, *counter_str;
@@ -69,8 +69,8 @@ void output_syntax_error(data_shell *data_sh, char *input_str,
 
 	syntax_msg2 = ": Syntax error: \"";
 	syntax_msg3 = "\" unexpected\n";
-	counter_str = convert_int_to_string(data_sh->counter);
-	length = get_str_length(data_sh->av[0]) + get_str_length(counter_str);
+	counter_str = convert_int_to_string(data_sh->counter_value);
+	length = get_str_length(data_sh->arguments[0]) + get_str_length(counter_str);
 	length += get_str_length(syntax_msg2) + get_str_length(syntax_msg3) + 2;
 	switch (input_str[index])
 	{
@@ -94,7 +94,7 @@ void output_syntax_error(data_shell *data_sh, char *input_str,
 		free(counter_str);
 		return;
 	}
-	copy_string(error_msg, data_sh->av[0]);
+	copy_string(error_msg, data_sh->arguments[0]);
 	concatenate_strings(error_msg, ": ");
 	concatenate_strings(error_msg, counter_str);
 	concatenate_strings(error_msg, syntax_msg2);
@@ -156,7 +156,7 @@ int locate_first_char(char *input_str, int *index_ptr)
  * @input_str: input string
  * Return: 1 if there is an error. 0 in other case
  */
-int validate_syntax(data_shell *data_sh, char *input_str)
+int validate_syntax(CustomShellData_t *data_sh, char *input_str)
 {
 	int begin_index = 0;
 	int first_char_index = 0;

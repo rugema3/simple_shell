@@ -4,76 +4,83 @@
 #include"shell.h"
 
 /* structs' list */
-/**
- * struct data - struct that contains all relevant data on runtime
- * @av: argument vector
- * @input: command line written by the user
- * @args: tokens of the command line
- * @status: last status of the shell
- * @counter: lines counter
- * @_environ: environment variable
- * @pid: process ID of the shell
- */
-typedef struct data
-{
-	char **av;
-	char *input;
-	char **args;
-	int status;
-	int counter;
-	char **_environ;
-	char *pid;
-} data_shell;
 
 /**
- * struct sep_list_s - single linked list
- * @separator: ; | &
- * @next: next node
- * Description: single linked list to store separators
+ * struct CustomShellData - Structure to hold custom shell data
+ * @arguments: Array of strings representing command-line arguments
+ * @input_data: String representing user input or input data
+ * @parsed_arguments: Array of strings representing parsed arguments
+ * @operation_status: Integer representing the status or result of an operation
+ * @counter_value: Integer used for counting or iteration
+ * @environment: Array of strings representing environment variables
+ * @process_identifier: String representing the process ID or identifier
+ *
+ * Description: Structure to encapsulate and store custom shell-related data.
  */
-typedef struct sep_list_s
+typedef struct CustomShellData
 {
-	char separator;
-	struct sep_list_s *next;
-} sep_list;
+	char **arguments;
+	char *input_data;
+	char **parsed_arguments;
+	int operation_status;
+	int counter_value;
+	char **environment;
+	char *process_identifier;
+} CustomShellData_t;
 
 /**
- * struct line_list_s - single linked list
- * @line: command line
- * @next: next node
- * Description: single linked list to store command lines
+ * struct custom_separator_node - Custom node for separator linked list
+ * @custom_character: Separator character
+ * @next: Pointer to the next node
+ *
+ * Description: Custom node structure for a linked list of separators.
  */
-typedef struct line_list_s
+typedef struct custom_separator_node
 {
-	char *line;
-	struct line_list_s *next;
-} line_list;
+	char custom_character;
+	struct custom_separator_node *next;
+} custom_separator_node_t;
 
 /**
- * struct r_var_list - single linked list
- * @len_var: length of the variable
- * @val: value of the variable
- * @len_val: length of the value
- * @next: next node
- * Description: single linked list to store variables
+ * struct custom_line_list - Single linked list for storing lines
+ * @text: Line of text
+ * @next: Pointer to the next node
+ *
+ * Description: Single linked list structure for storing lines of text.
  */
-typedef struct r_var_list
+typedef struct custom_line_list
 {
-	int len_var;
-	char *val;
-	int len_val;
-	struct r_var_list *next;
-} r_var;
+	char *text;
+	struct custom_line_list *next;
+} custom_line_list_t;
 
 /**
- * struct builtin_s - Builtin struct for command args.
- * @name: The name of the command builtin i.e cd, exit, env
- * @f: data type pointer function.
+ * struct custom_var_list - Single linked list for storing variables
+ * @variable_length: Length of the variable
+ * @variable_value: Value of the variable
+ * @value_length: Length of the value
+ * @next: Pointer to the next node
+ *
+ * Description: Single linked list structure for storing variables.
  */
-typedef struct builtin_s
+typedef struct custom_var_list
 {
-	char *name;
-	int (*f)(data_shell *datash);
-} builtin_t;
+	int variable_length;
+	char *variable_value;
+	int value_length;
+	struct custom_var_list *next;
+} custom_var_list_t;
+
+/**
+ * struct custom_builtin_s - Custom Builtin struct for command arguments.
+ * @command_name: The name of the custom command i.e cd, exit, env
+ * @function_ptr: Pointer to the function associated with the command.
+ */
+typedef struct custom_builtin_s
+{
+	char *command_name;
+	int (*function_ptr)(CustomShellData_t *datash);
+} custom_builtin_t;
 
 #endif
+

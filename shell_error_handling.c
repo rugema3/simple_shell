@@ -5,20 +5,20 @@
  * @data_sh: Pointer to the data structure.
  * Return: The error message string.
  */
-char *generate_error_msg(data_shell *data_sh)
+char *generate_error_msg(CustomShellData_t *data_sh)
 {
 	int msg_length;
 	char *error_msg;
 	char *counter_str;
 
 	/* Convert counter value to string */
-	counter_str = convert_int_to_string(data_sh->counter);
+	counter_str = convert_int_to_string(data_sh->counter_value);
 
 	/* Calculate total length of the error message */
-	msg_length =  get_str_length(data_sh->av[0]) +
+	msg_length =  get_str_length(data_sh->arguments[0]) +
 		get_str_length(counter_str);
-	msg_length += get_str_length(data_sh->args[0]) +
-		get_str_length(data_sh->args[1]) + 23;
+	msg_length += get_str_length(data_sh->parsed_arguments[0]) +
+		get_str_length(data_sh->parsed_arguments[1]) + 23;
 
 	/* Allocate memory for the error message */
 	error_msg = malloc(sizeof(char) * (msg_length + 1));
@@ -29,13 +29,13 @@ char *generate_error_msg(data_shell *data_sh)
 	}
 
 	/* Construct the error message */
-	copy_string(error_msg, data_sh->av[0]);
+	copy_string(error_msg, data_sh->arguments[0]);
 	concatenate_strings(error_msg, ": ");
 	concatenate_strings(error_msg, counter_str);
 	concatenate_strings(error_msg, ": ");
-	concatenate_strings(error_msg, data_sh->args[0]);
+	concatenate_strings(error_msg, data_sh->parsed_arguments[0]);
 	concatenate_strings(error_msg, ": number not allowed: ");
-	concatenate_strings(error_msg, data_sh->args[1]);
+	concatenate_strings(error_msg, data_sh->parsed_arguments[1]);
 	concatenate_strings(error_msg, "\n\0");
 
 	/* Free the counter string after use */
@@ -54,29 +54,29 @@ char *generate_error_msg(data_shell *data_sh)
  * @counter_str: counter lines
  * Return: error message
  */
-char *concatenate_cd_error(data_shell *data_sh, char *message,
+char *concatenate_cd_error(CustomShellData_t *data_sh, char *message,
 		char *error_output, char *counter_str)
 {
 	char *illegal_opt_flag;
 
-	copy_string(error_output, data_sh->av[0]);
+	copy_string(error_output, data_sh->arguments[0]);
 	concatenate_strings(error_output, ": ");
 	concatenate_strings(error_output, counter_str);
 	concatenate_strings(error_output, ": ");
-	concatenate_strings(error_output, data_sh->args[0]);
+	concatenate_strings(error_output, data_sh->parsed_arguments[0]);
 	concatenate_strings(error_output, message);
-	if (data_sh->args[1][0] == '-')
+	if (data_sh->parsed_arguments[1][0] == '-')
 	{
 		illegal_opt_flag = malloc(3);
 		illegal_opt_flag[0] = '-';
-		illegal_opt_flag[1] = data_sh->args[1][1];
+		illegal_opt_flag[1] = data_sh->parsed_arguments[1][1];
 		illegal_opt_flag[2] = '\0';
 		concatenate_strings(error_output, illegal_opt_flag);
 		free(illegal_opt_flag);
 	}
 	else
 	{
-		concatenate_strings(error_output, data_sh->args[1]);
+		concatenate_strings(error_output, data_sh->parsed_arguments[1]);
 	}
 
 	concatenate_strings(error_output, "\n");
@@ -91,18 +91,19 @@ char *concatenate_cd_error(data_shell *data_sh, char *message,
  * @data_sh: data relevant (directory)
  * Return: Error message
  */
-char *generate_permission_error(data_shell *data_sh)
+char *generate_permission_error(CustomShellData_t *data_sh)
 {
 	int err_msg_len;  /* Variable to store the length of the error message */
 	char *line_count_str;  /* Variable to store the line count as a string */
 	char *err_msg;  /* Variable to store the error message */
 
 	/* Convert the counter to a string */
-	line_count_str = convert_int_to_string(data_sh->counter);
+	line_count_str = convert_int_to_string(data_sh->counter_value);
 
 	/* Calculate the length of the error message */
-	err_msg_len = get_str_length(data_sh->av[0]) + get_str_length(line_count_str);
-	err_msg_len += get_str_length(data_sh->args[0]) + 24;
+	err_msg_len = get_str_length(data_sh->arguments[0]) +
+		get_str_length(line_count_str);
+	err_msg_len += get_str_length(data_sh->parsed_arguments[0]) + 24;
 
 	/* Allocate memory for the error message */
 	err_msg = malloc(sizeof(char) * (err_msg_len + 1));
@@ -114,11 +115,11 @@ char *generate_permission_error(data_shell *data_sh)
 	}
 
 	/* Build the error message */
-	copy_string(err_msg, data_sh->av[0]);
+	copy_string(err_msg, data_sh->arguments[0]);
 	concatenate_strings(err_msg, ": ");
 	concatenate_strings(err_msg, line_count_str);
 	concatenate_strings(err_msg, ": ");
-	concatenate_strings(err_msg, data_sh->args[0]);
+	concatenate_strings(err_msg, data_sh->parsed_arguments[0]);
 	concatenate_strings(err_msg, ": Permission denied\n");
 	concatenate_strings(err_msg, "\0");
 
@@ -134,13 +135,13 @@ char *generate_permission_error(data_shell *data_sh)
  * @data_sh: data relevant (directory)
  * Return: Error message
  */
-char *generate_cd_error(data_shell *data_sh)
+char *generate_cd_error(CustomShellData_t *data_sh)
 {
 	int msg_length, id_len;
 	char *error_output, *counter_str, *message;
 
-	counter_str = convert_int_to_string(data_sh->counter);
-	if (data_sh->args[1][0] == '-')
+	counter_str = convert_int_to_string(data_sh->counter_value);
+	if (data_sh->parsed_arguments[1][0] == '-')
 	{
 		message = ": Illegal option ";
 		id_len = 2;
@@ -148,11 +149,11 @@ char *generate_cd_error(data_shell *data_sh)
 	else
 	{
 		message = ": can't cd to ";
-		id_len = get_str_length(data_sh->args[1]);
+		id_len = get_str_length(data_sh->parsed_arguments[1]);
 	}
 
-	msg_length = get_str_length(data_sh->av[0]) +
-		get_str_length(data_sh->args[0]);
+	msg_length = get_str_length(data_sh->arguments[0]) +
+		get_str_length(data_sh->parsed_arguments[0]);
 	msg_length += get_str_length(counter_str) +
 		get_str_length(message) + id_len + 5;
 	error_output = malloc(sizeof(char) * (msg_length + 1));
@@ -176,15 +177,16 @@ char *generate_cd_error(data_shell *data_sh)
  * @data_sh: data relevant (counter, arguments)
  * Return: Error message
  */
-char *generate_not_found_error(data_shell *data_sh)
+char *generate_not_found_error(CustomShellData_t *data_sh)
 {
 	int msg_length;
 	char *error_output;
 	char *counter_str;
 
-	counter_str = convert_int_to_string(data_sh->counter);
-	msg_length = get_str_length(data_sh->av[0]) + get_str_length(counter_str);
-	msg_length += get_str_length(data_sh->args[0]) + 16;
+	counter_str = convert_int_to_string(data_sh->counter_value);
+	msg_length = get_str_length(data_sh->arguments[0]) +
+		get_str_length(counter_str);
+	msg_length += get_str_length(data_sh->parsed_arguments[0]) + 16;
 	error_output = malloc(sizeof(char) * (msg_length + 1));
 	if (error_output == 0)
 	{
@@ -192,11 +194,11 @@ char *generate_not_found_error(data_shell *data_sh)
 		free(counter_str);
 		return (NULL);
 	}
-	copy_string(error_output, data_sh->av[0]);
+	copy_string(error_output, data_sh->arguments[0]);
 	concatenate_strings(error_output, ": ");
 	concatenate_strings(error_output, counter_str);
 	concatenate_strings(error_output, ": ");
-	concatenate_strings(error_output, data_sh->args[0]);
+	concatenate_strings(error_output, data_sh->parsed_arguments[0]);
 	concatenate_strings(error_output, ": not found\n");
 	concatenate_strings(error_output, "\0");
 	free(counter_str);

@@ -51,8 +51,8 @@ char *swapCharacters(char *input, int swap)
  * @input: input string
  * Return: no return
  */
-void addSeparatorsAndCommands(sep_list **separatorListHead,
-		line_list **commandListHead, char *input)
+void addSeparatorsAndCommands(custom_separator_node_t **separatorListHead,
+		custom_line_list_t **commandListHead, char *input)
 {
 	int i;
 	char *line;
@@ -88,12 +88,12 @@ void addSeparatorsAndCommands(sep_list **separatorListHead,
  * @datash: data structure
  * Return: no return
  */
-void goToNextCommand(sep_list **separatorList,
-	line_list **commandList, data_shell *datash)
+void goToNextCommand(custom_separator_node_t **separatorList,
+	custom_line_list_t **commandList, CustomShellData_t *datash)
 {
 	int loopSeparator;
-	sep_list *ls_s;
-	line_list *ls_l;
+	custom_separator_node_t *ls_s;
+	custom_line_list_t *ls_l;
 
 	loopSeparator = 1;
 	ls_s = *separatorList;
@@ -101,18 +101,18 @@ void goToNextCommand(sep_list **separatorList,
 
 	while (ls_s != NULL && loopSeparator)
 	{
-		if (datash->status == 0)
+		if (datash->operation_status == 0)
 		{
-			if (ls_s->separator == '&' || ls_s->separator == ';')
+			if (ls_s->custom_character == '&' || ls_s->custom_character == ';')
 				loopSeparator = 0;
-			if (ls_s->separator == '|')
+			if (ls_s->custom_character == '|')
 				ls_l = ls_l->next, ls_s = ls_s->next;
 		}
 		else
 		{
-			if (ls_s->separator == '|' || ls_s->separator == ';')
+			if (ls_s->custom_character == '|' || ls_s->custom_character == ';')
 				loopSeparator = 0;
-			if (ls_s->separator == '&')
+			if (ls_s->custom_character == '&')
 				ls_l = ls_l->next, ls_s = ls_s->next;
 		}
 		if (ls_s != NULL && !loopSeparator)
@@ -131,11 +131,11 @@ void goToNextCommand(sep_list **separatorList,
  * @input: input string
  * Return: 0 to exit, 1 to continue
  */
-int splitAndExecuteCommands(data_shell *datash, char *input)
+int splitAndExecuteCommands(CustomShellData_t *datash, char *input)
 {
 
-	sep_list *separatorListHead, *separatorList;
-	line_list *commandListHead, *commandList;
+	custom_separator_node_t *separatorListHead, *separatorList;
+	custom_line_list_t *commandListHead, *commandList;
 	int loop;
 
 	separatorListHead = NULL;
@@ -148,10 +148,10 @@ int splitAndExecuteCommands(data_shell *datash, char *input)
 
 	while (commandList != NULL)
 	{
-		datash->input = commandList->line;
-		datash->args = tokenizeInputString(datash->input);
+		datash->input_data = commandList->text;
+		datash->parsed_arguments = tokenizeInputString(datash->input_data);
 		loop = find_builtin(datash);
-		free(datash->args);
+		free(datash->parsed_arguments);
 
 		if (loop == 0)
 			break;

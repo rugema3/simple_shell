@@ -3,17 +3,18 @@
 /**
  * find_builtin - Finds and executes built-in commands.
  *
- * @datash: Pointer to the data_shell struct containing relevant data (args).
+ * @datash: Pointer to the CustomShellData_t struct
+ * containing relevant data (parsed_arguments).
  * Return: 1 on success.
  */
-int find_builtin(data_shell *datash)
+int find_builtin(CustomShellData_t *datash)
 {
-	int (*builtin)(data_shell *datash);
+	int (*builtin)(CustomShellData_t *datash);
 
-	if (datash->args[0] == NULL)
+	if (datash->parsed_arguments[0] == NULL)
 		return (1);
 
-	builtin = find_builtin_function(datash->args[0]);
+	builtin = find_builtin_function(datash->parsed_arguments[0]);
 
 	if (builtin != NULL)
 		return (builtin(datash));
@@ -27,12 +28,13 @@ int find_builtin(data_shell *datash)
  * @data: Data structure
  * Return: void
  */
-void searchEnvironmentVariable(r_var **head, char *input, data_shell *data)
+void searchEnvironmentVariable(custom_var_list_t
+		**head, char *input, CustomShellData_t *data)
 {
 	int row, chr, j, val_len;
 	char **environment;
 
-	environment = data->_environ;
+	environment = data->environment;
 	for (row = 0; environment[row]; row++)
 	{
 		for (j = 1, chr = 0; environment[row][chr]; chr++)
@@ -70,13 +72,13 @@ void searchEnvironmentVariable(r_var **head, char *input, data_shell *data)
  * @data: Data structure
  * Return: Length of the search
  */
-int searchSpecialVariables(r_var **head, char *input,
-char *status, data_shell *data)
+int searchSpecialVariables(custom_var_list_t **head, char *input,
+char *status, CustomShellData_t *data)
 {
 	int i, status_len, pid_len;
 
 	status_len =  get_str_length(status);
-	pid_len =  get_str_length(data->pid);
+	pid_len =  get_str_length(data->process_identifier);
 
 	for (i = 0; input[i]; i++)
 	{
@@ -85,7 +87,7 @@ char *status, data_shell *data)
 			if (input[i + 1] == '?')
 				append(head, 2, status, status_len), i++;
 			else if (input[i + 1] == '$')
-				append(head, 2, data->pid, pid_len), i++;
+				append(head, 2, data->process_identifier, pid_len), i++;
 			else if (input[i + 1] == '\n' || input[i + 1] == '\0' ||
 					input[i + 1] == ' ' || input[i + 1] == '\t' || input[i + 1] == ';')
 				append(head, 0, NULL, 0);
@@ -106,10 +108,10 @@ char *status, data_shell *data)
  * @newLength: New length of the string
  * Return: Replaced string
  */
-char *replaceStringWithVariables(r_var **head, char *input,
+char *replaceStringWithVariables(custom_var_list_t **head, char *input,
 		char *newInput, int newLength)
 {
-	r_var *index;
+	custom_var_list_t *index;
 	int i, j, k;
 
 	index = *head;
@@ -117,22 +119,22 @@ char *replaceStringWithVariables(r_var **head, char *input,
 	{
 		if (input[j] == '$')
 		{
-			if (!(index->len_var) && !(index->len_val))
+			if (!(index->variable_length) && !(index->value_length))
 			{
 				newInput[i] = input[j];
 				j++;
 			}
-			else if (index->len_var && !(index->len_val))
-				for (k = 0; k < index->len_var; k++)
+			else if (index->variable_length && !(index->value_length))
+				for (k = 0; k < index->variable_length; k++)
 					j++;
 			else
 			{
-				for (k = 0; k < index->len_val; k++)
+				for (k = 0; k < index->value_length; k++)
 				{
-					newInput[i] = index->val[k];
+					newInput[i] = index->variable_value[k];
 					i++;
 				}
-				j += (index->len_var);
+				j += (index->variable_length);
 				i--;
 			}
 			index = index->next;
@@ -154,13 +156,13 @@ char *replaceStringWithVariables(r_var **head, char *input,
  * @datash: Data structure
  * Return: Replaced string
  */
-char *replaceVariablesInInput(char *input, data_shell *datash)
+char *replaceVariablesInInput(char *input, CustomShellData_t *datash)
 {
-	r_var *head, *index;
+	custom_var_list_t *head, *index;
 	char *status, *newInput;
 	int originalLen, newLen;
 
-	status = convert_int_to_string(datash->status);
+	status = convert_int_to_string(datash->operation_status);
 	head = NULL;
 
 	originalLen = searchSpecialVariables(&head, input, status, datash);
@@ -176,7 +178,7 @@ char *replaceVariablesInInput(char *input, data_shell *datash)
 
 	while (index != NULL)
 	{
-		newLen += (index->len_val - index->len_var);
+		newLen += (index->value_length - index->variable_length);
 		index = index->next;
 	}
 

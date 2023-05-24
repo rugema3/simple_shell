@@ -7,7 +7,7 @@
  * relevant data (status and args).
  * Return: 0 on success.
  */
-int terminate(data_shell *datash)
+int terminate(CustomShellData_t *datash)
 {
 	unsigned int exit_status;
 	int is_num;
@@ -15,11 +15,11 @@ int terminate(data_shell *datash)
 	int is_big_number;
 
 	/* Check if an exit status is provided as an argument */
-	if (datash->args[1] != NULL)
+	if (datash->parsed_arguments[1] != NULL)
 	{
-		exit_status = convert_string_to_int(datash->args[1]);
-		is_num = is_digit(datash->args[1]);
-		str_len =  get_str_length(datash->args[1]);
+		exit_status = convert_string_to_int(datash->parsed_arguments[1]);
+		is_num = is_digit(datash->parsed_arguments[1]);
+		str_len =  get_str_length(datash->parsed_arguments[1]);
 		is_big_number = exit_status > (unsigned int)INT_MAX;
 
 		/* Validate the exit status argument */
@@ -27,12 +27,12 @@ int terminate(data_shell *datash)
 		{
 			/* Display error message and set status to 2 */
 			handle_exit_status(datash, 2);
-			datash->status = 2;
+			datash->operation_status = 2;
 			return (1); /* Return 1 to indicate an error */
 		}
 
 		/* Set the exit status based on the provided argument */
-		datash->status = (exit_status % 256);
+		datash->operation_status = (exit_status % 256);
 	}
 
 	return (0); /* Return 0 on success */
@@ -44,30 +44,30 @@ int terminate(data_shell *datash)
  * relevant data (args and input).
  * Return: Always returns 1.
  */
-int show_help_info(data_shell *datash)
+int show_help_info(CustomShellData_t *datash)
 {
-	if (datash->args[1] == 0)
+	if (datash->parsed_arguments[1] == 0)
 		display_general_help();  /* Display general help information */
-	else if (compare_strings(datash->args[1], "setenv") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "setenv") == 0)
 		display_setenv_help();  /* Display help information  */
-	else if (compare_strings(datash->args[1], "env") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "env") == 0)
 		display_env_help();  /* Display help information for env command */
-	else if (compare_strings(datash->args[1], "unsetenv") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "unsetenv") == 0)
 		display_unsetenv_help();  /* Display help information for unsetenv command */
-	else if (compare_strings(datash->args[1], "help") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "help") == 0)
 		display_help_command();  /* Display help information for help command */
-	else if (compare_strings(datash->args[1], "exit") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "exit") == 0)
 		display_exit_help();  /* Display help information for exit command */
-	else if (compare_strings(datash->args[1], "cd") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "cd") == 0)
 		display_cd_help();  /* Display help information for cd command */
-	else if (compare_strings(datash->args[1], "alias") == 0)
+	else if (compare_strings(datash->parsed_arguments[1], "alias") == 0)
 		display_alias_help();  /* Display help information for alias command */
 	else
-		write(STDERR_FILENO, datash->args[0],
-		       get_str_length(datash->args[0]));
+		write(STDERR_FILENO, datash->parsed_arguments[0],
+		       get_str_length(datash->parsed_arguments[0]));
 	/* Invalid command, display error message */
 
-	datash->status = 0;
+	datash->operation_status = 0;
 	return (1);
 }
 
@@ -77,20 +77,20 @@ int show_help_info(data_shell *datash)
  * main - Entry point
  *
  * @ac: argument count
- * @av: argument vector
+ * @arguments: argument vector
  *
  * Return: 0 on success.
  */
-int main(int ac, char **av)
+int main(int ac, char **arguments)
 {
-	data_shell datash;
+	CustomShellData_t datash;
 	(void) ac;
 
 	signal(SIGINT, prompt);
-	setup_data_shell(&datash, av);
+	setup_CustomShellData_t(&datash, arguments);
 	interactive_shell(&datash);
-	deallocate_data_shell(&datash);
-	if (datash.status < 0)
+	deallocate_CustomShellData_t(&datash);
+	if (datash.operation_status < 0)
 		return (255);
-	return (datash.status);
+	return (datash.operation_status);
 }
